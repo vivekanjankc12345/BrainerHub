@@ -12,18 +12,18 @@ userRouter.post('/register', async (req: Request, res: Response) => {
     const existingUser = await SignUpModel.findOne({ email });
 
     if (existingUser) {
-      return res.status(409).json({
+      return res.status(401).json({
         status: 0,
-        data: null,
+        data: "Email already registered",
         message: 'Email already registered',
       });
     }
 
     bcrypt.hash(password, 5, async (err, secure_password) => {
       if (err) {
-        res.status(401).json({
+        res.status(409).json({
           status: 0,
-          data: null,
+          data: err,
           message: 'Invalid credentials',
         });
       } else {
@@ -58,7 +58,7 @@ userRouter.post('/login', async (req: Request, res: Response) => {
           const token = jwt.sign({ foo: 'bar' }, process.env.key||"", { expiresIn: '1h' });
           res.json({
             status: 1,
-            data: { token },
+            data: { token,postlogin },
             message: 'Login successful',
           });
         } else {
